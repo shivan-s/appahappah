@@ -1,0 +1,9 @@
+:root {
+  --primary-col: blue;
+  --background-col: snow;
+}
+
+* {
+  padding: 0px;
+  margin: 0px;
+}

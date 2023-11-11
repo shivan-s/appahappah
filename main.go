@@ -1,19 +1,28 @@
 package main
 
 import (
-	"fmt"
+	"html/template"
 	"os"
 
 	md "github.com/gomarkdown/markdown"
 )
 
-func main() {
-	fileIn := "content/index.md"
-	content, _ := os.ReadFile(fileIn)
-	html := md.ToHTML(content, nil, nil)
-	fmt.Printf(string(html))
+type Layout struct {
+	Title   string
+	Content template.HTML
+}
 
-	fileOut := "public/index.html"
+func main() {
+	content, _ := os.ReadFile("content/index.md")
+	html := md.ToHTML(content, nil, nil)
+
 	os.Mkdir("public", 0755)
-	os.WriteFile(fileOut, html, 0644)
+	f, _ := os.Create("public/index.html")
+	t, _ := template.ParseFiles("static/layout.html")
+	t.Execute(f, Layout{Title: "Appahappah", Content: template.HTML(html)})
+	f.Close()
+
+	os.Mkdir("public/css", 0755)
+	css, _ := os.ReadFile("static/css/style.css")
+	os.WriteFile("public/css/style.css", css, 0644)
 }
