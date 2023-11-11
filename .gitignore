@@ -1,0 +1,20 @@
+# Ignore everything
+*
+
+# But not these files...
+!/.gitignore
+!.github/workflows/*
+
+!content/*
+
+!*.go
+!go.sum
+!go.mod
+
+!README.md
+!LICENSE
+
+# !Makefile
+
+# ...even if they are in subdirectories
+!*/
