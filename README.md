@@ -1,5 +1,7 @@
 # Appahappah
 
+[![Deploy](https://github.com/shivan-s/appahappah/actions/workflows/main.yml/badge.svg)](https://github.com/shivan-s/appahappah/actions/workflows/main.yml)
+
 Appahappah is what I would call my paternal grandfather. He passed away on the 4th of November 2023.
 
 This project is dedicated to him.
