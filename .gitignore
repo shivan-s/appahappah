@@ -1,9 +1,12 @@
 # Ignore everything
+public/*
 *
 
 # But not these files...
 !/.gitignore
 !.github/workflows/*
+
+!.air.toml
 
 !content/*
 !static/*

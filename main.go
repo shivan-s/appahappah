@@ -1,12 +1,20 @@
 package main
 
 import (
-	"fmt"
 	"html/template"
+	"log"
 	"os"
+	fp "path/filepath"
 	"strings"
 
 	md "github.com/gomarkdown/markdown"
+	"github.com/gomarkdown/markdown/parser"
+)
+
+const (
+	publicDir  = "public"
+	staticDir  = "static"
+	contentDir = "content"
 )
 
 type Layout struct {
@@ -16,17 +24,22 @@ type Layout struct {
 	Footer template.HTML
 }
 
-func main() {
-	headerContent, _ := os.ReadFile("content/header.md")
-	header := md.ToHTML(headerContent, nil, nil)
-	bodyContent, _ := os.ReadFile("content/index.md")
-	body := md.ToHTML(bodyContent, nil, nil)
-	footerContent, _ := os.ReadFile("content/footer.md")
-	footer := md.ToHTML(footerContent, nil, nil)
+func mdToHTML(f string) ([]byte, error) {
+	content, err := os.ReadFile(fp.Join(contentDir, f))
+	extension := parser.CommonExtensions | parser.AutoHeadingIDs
+	p := parser.NewWithExtensions(extension)
+	html := md.ToHTML(content, p, nil)
+	return html, err
+}
 
-	os.Mkdir("public", 0755)
-	f, _ := os.Create("public/index.html")
-	t, _ := template.ParseFiles("static/layout.html")
+func main() {
+	header, err := mdToHTML("header.md")
+	body, err := mdToHTML("index.md")
+	footer, err := mdToHTML("footer.md")
+
+	os.Mkdir(publicDir, 0755)
+	f, err := os.Create(fp.Join(publicDir, "index.html"))
+	t, err := template.ParseFiles(fp.Join(staticDir, "layout.html"))
 	t.Execute(
 		f,
 		Layout{
@@ -38,24 +51,28 @@ func main() {
 	)
 	f.Close()
 
-	os.Mkdir("public/css", 0755)
-	css, _ := os.ReadFile("static/css/style.css")
-	os.WriteFile("public/css/style.css", css, 0644)
+	os.Mkdir(fp.Join(staticDir, "css"), 0755)
+	css, err := os.ReadFile(fp.Join(staticDir, "css", "style.css"))
+	os.WriteFile(fp.Join(publicDir, "css", "style.css"), css, 0644)
 
-	os.Mkdir("public/img", 0755)
-	imgs, _ := os.ReadDir("static/img")
+	os.Mkdir(fp.Join(publicDir, "img"), 0755)
+	imgs, err := os.ReadDir(fp.Join(staticDir, "img"))
 	for _, img := range imgs {
 		if img.IsDir() == false {
 			s := strings.Split(img.Name(), ".")
 			ext := s[len(s)-1]
 			if ext == "jpg" || ext == "jpeg" || ext == "png" {
-				data, err := os.ReadFile(fmt.Sprintf("static/img/%v", img.Name()))
-				err = os.WriteFile(fmt.Sprintf("public/img/%v", img.Name()), data, 0644)
+				data, err := os.ReadFile(fp.Join(staticDir, "img", img.Name()))
+				err = os.WriteFile(fp.Join(staticDir, "img", img.Name()), data, 0644)
 				if err != nil {
-					fmt.Println(err)
+					log.Fatal(err)
 				}
 
 			}
 		}
+	}
+
+	if err != nil {
+		log.Fatal(err)
 	}
 }

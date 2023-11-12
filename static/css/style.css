@@ -6,16 +6,38 @@
   --background-col: aliceblue;
 }
 
+@keyframes fadeIn {
+  0% {
+    opatity: 0;
+  }
+  100% {
+    opatity: 0;
+  }
+}
+
+@keyframes highlightTarget {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+:target {
+  animation: highlightTarget 0.5s 2;
+  text-decoration: underline;
+}
+
 * {
   padding: 0px;
   margin: 0px;
-  border: 0px red solid;
+  border: 0px red solid; /* For debugging */
 }
 
 html {
   color: var(--text-col);
   background-color: var(--background-col);
-  font-family: sans-serif;
+  font-family: "Merriweather", serif;
+  scroll-behavior: smooth;
+  scroll-padding-top: 3rem;
 }
 
 body {
@@ -54,15 +76,17 @@ footer {
   border-top: 1px solid var(--primary-col);
   padding: 2rem 0rem 2rem 0rem;
   width: 100%;
-  justify-content: center;
+  justify-content: space-evenly;
   align-items: center;
 }
 
 img {
-  border-radius: 1rem;
-  box-shadow: 0 1px 3px 0 black;
+  border-radius: 3rem;
+  box-shadow: 0 2px 5px 0 black;
   margin: 1rem 0rem 1rem 0rem;
   width: 400px;
+  transition: border-radius 0.3s;
+  animation: fadeIn 1s;
 }
 
 img:hover {
@@ -71,6 +95,7 @@ img:hover {
 
 a {
   color: var(--primary-col);
+  transition: color 0.3s;
 }
 
 a:hover {
@@ -93,4 +118,9 @@ h2 {
 
 h3 {
   margin: 0rem 0rem 0.25rem 0rem;
+}
+
+p:after {
+  content: "\A\A";
+  white-space: pre;
 }

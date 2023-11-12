@@ -2,18 +2,35 @@
 
 [![Deploy](https://github.com/shivan-s/appahappah/actions/workflows/main.yml/badge.svg)](https://github.com/shivan-s/appahappah/actions/workflows/main.yml)
 
-Appahappah is what I would call my paternal grandfather. He passed away on the 4th of November 2023.
+As a Sri Lankan Tamil, _Appahappah_ is what I would call my paternal grandfather. On the 4th of November 2023, he passed away in hospital.
 
 This project is dedicated to him.
 
-## The Project
+## Motivation
 
-This is a miniature static site generator written in Golang. The inspiration was not only to honour my Appahappah but also to learn Golang (I usually used Typescript for work and have used Python in the past quite extensively). The project takes markdown files and converts this into HTML with the use of the standard library as well as some third party packages.
+Honouring my grandfather is one aspect, but education is also another. This could have been written in simple HTML and CSS. However, I wanted to include Golang in the mix, as that is the language I want to learn after extensive experience (relative to myself) with Typescript and Python.
 
-Github actions is responsible for running the Go code, which turns the markdown into HTML as well as moving some images and CSS files. This is then hosted statically using Github pages.
+## How it works
 
-## How it works ++
+Put simply, this is a miniature static site generator.
 
-It starts with the `/static` directory which contains a `layout.html` file; this file is boiler plate for the markdown files in the `/content` directory for when they are compiled into HTML. There are three different markdown files, `header.md`, `index.md`, and `footer.md` so that styling can be applied to them individually inside their `<header>`, `<main>` and `<footer>` HTML tags respectively.
+It's easy to begin with the `/static` directory, where we have `css/styles.css`, which contains our CSS rules, along with an `/img` directory which contains our images. These files are copied by the Go code and placed in a `/public` directory on the build step before the site is distributed via a CDN.
 
-The `static/css/style.css` file is copied to the `/public` directory along with a freshly created `index.html` file from the Go code. Images with extensions `jpg`, `jpeg`, and `png` are also copied to the `/public/img` directory. The `/public` directory is not committed to the repository but this is what GitHub pages uses to deliver content.
+Also, in the `/static` directory is a template HTML file, `layout.html`. This is used by the Go code, where in the build step, the markdown files in `/content` are translated into HTML and then inserted into `layout.html`. This creates `index.html` in the `/public` directory.
+
+## Deployment
+
+As mentioned, Golang is used in the build step to create files in the `/public` directory. Notice that this directory is not committed to the source repository. Instead, GitHub Actions will initialise this build process with every commit. With a `/public` directory set as an artifact, this can be used by GitHub Pages for hosting. In addition to GitHub Pages acting as a CDN host, Cloudflare is also being used to - a Go worker is used to complete the build step before deploying the output onto their CDN.
+
+## Local Development
+
+Only [Go (version 1.20 or above)](https://go.dev/) is required, but other tools can be useful.
+
+These include:
+
+- `[air](https://github.com/cosmtrek/air)` - This runs the Go build step command every time there is a change in the code written. This saves having to run `go run main.go` after every single code change. All you need to do is run `air` in command line as the configuration handles the rest.
+- `[live-server](https://github.com/tapio/live-server)` - `cd ./public` and once in this directory run `npx live-server .`. This will server the `index.html` file via HTTP server and can be accessed usually via `http://localhost:8080`.
+
+## Feedback
+
+Thanks for reading this and I hope you find it useful and feel free to get in touch if you have any feedback, questions or suggestions.
