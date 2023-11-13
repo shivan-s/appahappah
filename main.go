@@ -24,24 +24,32 @@ type Layout struct {
 	Footer template.HTML
 }
 
-func mdToHTML(f string) ([]byte, error) {
+func mdToHTML(f string) []byte {
 	content, err := os.ReadFile(fp.Join(contentDir, f))
+	if err != nil {
+		log.Fatal(err)
+		os.Exit(1)
+	}
 	extension := parser.CommonExtensions | parser.AutoHeadingIDs
 	p := parser.NewWithExtensions(extension)
 	html := md.ToHTML(content, p, nil)
-	return html, err
+	return html
+}
+
+func createDir(p string) {
+	os.Mkdir(p, 0755)
 }
 
 func main() {
-	header, err := mdToHTML("header.md")
-	body, err := mdToHTML("index.md")
-	footer, err := mdToHTML("footer.md")
+	header := mdToHTML("header.md")
+	body := mdToHTML("index.md")
+	footer := mdToHTML("footer.md")
 
-	os.Mkdir(publicDir, 0755)
-	f, err := os.Create(fp.Join(publicDir, "index.html"))
+	createDir(publicDir)
+	htmlF, err := os.Create(fp.Join(publicDir, "index.html"))
 	t, err := template.ParseFiles(fp.Join(staticDir, "layout.html"))
 	t.Execute(
-		f,
+		htmlF,
 		Layout{
 			Title:  "Appahappah",
 			Header: template.HTML(header),
@@ -49,13 +57,15 @@ func main() {
 			Footer: template.HTML(footer),
 		},
 	)
-	f.Close()
+	defer htmlF.Close()
 
-	os.Mkdir(fp.Join(staticDir, "css"), 0755)
+	createDir(fp.Join(publicDir, "css"))
 	css, err := os.ReadFile(fp.Join(staticDir, "css", "style.css"))
-	os.WriteFile(fp.Join(publicDir, "css", "style.css"), css, 0644)
+	cssF, err := os.Create(fp.Join(publicDir, "css", "style.css"))
+	_, err = cssF.Write(css)
+	defer cssF.Close()
 
-	os.Mkdir(fp.Join(publicDir, "img"), 0755)
+	createDir(fp.Join(publicDir, "img"))
 	imgs, err := os.ReadDir(fp.Join(staticDir, "img"))
 	for _, img := range imgs {
 		if img.IsDir() == false {
@@ -63,10 +73,13 @@ func main() {
 			ext := s[len(s)-1]
 			if ext == "jpg" || ext == "jpeg" || ext == "png" {
 				data, err := os.ReadFile(fp.Join(staticDir, "img", img.Name()))
-				err = os.WriteFile(fp.Join(staticDir, "img", img.Name()), data, 0644)
+				imgF, err := os.Create(fp.Join(publicDir, "img", img.Name()))
+				_, err = imgF.Write(data)
 				if err != nil {
 					log.Fatal(err)
+					os.Exit(1)
 				}
+				defer imgF.Close()
 
 			}
 		}
@@ -74,5 +87,6 @@ func main() {
 
 	if err != nil {
 		log.Fatal(err)
+		os.Exit(1)
 	}
 }
