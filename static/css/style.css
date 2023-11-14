@@ -1,9 +1,9 @@
 :root {
   --primary-col: darkgoldenrod;
-  --secondary-col: beige;
+  --secondary-col: floralwhite;
   --accent-col: indigo;
   --text-col: darkslategrey;
-  --background-col: beige;
+  --background-col: floralwhite;
 }
 
 @keyframes fadeIn {
